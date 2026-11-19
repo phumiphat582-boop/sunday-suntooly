@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard | SUNDAY SUNTOOLY</title>
+  </head>
+  <body class="bg-gray-100 min-h-screen font-sans">
+
+    <!-- หน้าล็อกอิน (แสดงก่อนเข้าใช้งาน) -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-[#008060] to-[#004d3a]">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8">
+        <div class="text-center mb-6">
+          <div class="inline-block bg-[#008060] text-white font-black text-xl px-4 py-1.5 rounded-lg mb-2">
+            SUNDAY <span class="text-[#F58220]">SUNTOOLY</span>
+          </div>
+          <h1 class="text-xl font-bold text-gray-800">ระบบจัดการหลังบ้าน (Admin)</h1>
+          <p class="text-xs text-gray-500 mt-1">กรุณาเข้าสู่ระบบเพื่อจัดการสินค้าและราคา</p>
+        </div>
+
+        <form id="adminLoginForm" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">ชื่อผู้ใช้ (Username)</label>
+            <input type="text" id="usernameInput" value="admin" required class="w-full border rounded-lg px-3.5 py-2 text-sm focus:ring-2 focus:ring-[#008060] outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">รหัสผ่าน (Password)</label>
+            <input type="password" id="passwordInput" placeholder="รหัสทดสอบ: admin123" required class="w-full border rounded-lg px-3.5 py-2 text-sm focus:ring-2 focus:ring-[#008060] outline-none" />
+          </div>
+          <button type="submit" class="w-full bg-[#F58220] hover:bg-[#e07316] text-white font-bold py-2.5 rounded-lg shadow transition">
+            เข้าสู่ระบบแอดมิน
+          </button>
+        </form>
+
+        <div class="mt-6 text-center">
+          <a href="/index.html" class="text-xs text-[#008060] hover:underline">← กลับไปหน้าร้านค้า</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- หน้า Dashboard แอดมิน (ซ่อนไว้จนกว่าจะล็อกอินผ่าน) -->
+    <div id="dashboardScreen" class="hidden">
+      <!-- Navbar แอดมิน -->
+      <header class="bg-gray-900 text-white shadow-md sticky top-0 z-30">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <span class="bg-[#008060] text-white font-black px-2.5 py-1 rounded text-sm">SUNDAY SUNTOOLY</span>
+            <span class="text-sm font-semibold text-gray-300">| ระบบจัดการสต็อกและราคา</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <a href="/index.html" target="_blank" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition">
+              🌐 ดูหน้าร้านจริง
+            </a>
+            <button id="logoutBtn" class="text-xs bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-lg font-semibold transition">
+              ออกจากระบบ
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main class="max-w-6xl mx-auto px-4 py-6">
+        <!-- การ์ดสรุปภาพรวมสต็อก -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+          <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-[#008060]">
+            <p class="text-xs text-gray-500">รายการสินค้าทั้งหมด</p>
+            <p id="statTotalProducts" class="text-2xl font-bold text-gray-800 mt-1">0</p>
+          </div>
+          <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500">
+            <p class="text-xs text-gray-500">จำนวนสต็อกรวม (ชิ้น)</p>
+            <p id="statTotalStock" class="text-2xl font-bold text-gray-800 mt-1">0</p>
+          </div>
+          <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-[#F58220]">
+            <p class="text-xs text-gray-500">สินค้าใกล้หมด (≤ 5 ชิ้น)</p>
+            <p id="statLowStock" class="text-2xl font-bold text-[#F58220] mt-1">0</p>
+          </div>
+          <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-[#EE2E24]">
+            <p class="text-xs text-gray-500">สินค้าหมดสต็อก</p>
+            <p id="statOutOfStock" class="text-2xl font-bold text-[#EE2E24] mt-1">0</p>
+          </div>
+        </div>
+
+        <!-- แถบเครื่องมือค้นหาและปุ่มเพิ่มสินค้า -->
+        <div class="bg-white p-4 rounded-xl shadow-sm mb-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+          <div class="flex flex-1 w-full gap-2">
+            <input 
+              type="text" 
+              id="adminSearchInput" 
+              placeholder="ค้นหาชื่อสินค้าในคลัง..." 
+              class="flex-1 border rounded-lg px-3.5 py-2 text-sm focus:ring-2 focus:ring-[#008060] outline-none"
+            />
+            <select id="adminCategoryFilter" class="border rounded-lg px-3 py-2 text-sm bg-white">
+              <option value="all">ทุกหมวดหมู่</option>
+              <option value="food">🍱 อาหารพร้อมทาน</option>
+              <option value="drink">🥤 เครื่องดื่ม</option>
+              <option value="snack">🍿 ขนมขบเคี้ยว</option>
+              <option value="daily">🧴 ของใช้ส่วนตัว</option>
+            </select>
+          </div>
+
+          <div class="flex gap-2 w-full sm:w-auto justify-end">
+            <button id="resetDefaultBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-2 rounded-lg text-xs font-semibold">
+              รีเซ็ตข้อมูลเริ่มต้น
+            </button>
+            <button id="addProductBtn" class="bg-[#008060] hover:bg-[#00664d] text-white px-4 py-2 rounded-lg text-sm font-bold shadow">
+              + เพิ่มสินค้าใหม่
+            </button>
+          </div>
+        </div>
+
+        <!-- ตารางจัดการสินค้า -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden border">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-gray-50 border-b text-gray-600 text-xs uppercase">
+                  <th class="py-3 px-4">สินค้า</th>
+                  <th class="py-3 px-4">หมวดหมู่</th>
+                  <th class="py-3 px-4">ราคาขาย (฿)</th>
+                  <th class="py-3 px-4">ราคาเดิม</th>
+                  <th class="py-3 px-4">สต็อกคงเหลือ</th>
+                  <th class="py-3 px-4">โปรโมชั่น</th>
+                  <th class="py-3 px-4 text-right">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="adminTableBody" class="divide-y divide-gray-200 text-sm">
+                <!-- รายการสินค้าจะถูกสร้างโดย src/admin.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Modal เพิ่ม / แก้ไขสินค้า -->
+    <div id="productModal" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4">
+      <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
+        <h3 id="modalTitle" class="text-lg font-bold text-gray-800 mb-4">+ เพิ่มสินค้าใหม่</h3>
+        
+        <form id="productForm" class="space-y-3 text-sm">
+          <input type="hidden" id="editId" />
+          
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">ชื่อสินค้า</label>
+            <input type="text" id="nameInput" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#008060] outline-none" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-medium text-gray-700 mb-1">หมวดหมู่</label>
+              <select id="categoryInput" class="w-full border rounded-lg px-3 py-2 bg-white">
+                <option value="food">🍱 อาหารพร้อมทาน</option>
+                <option value="drink">🥤 เครื่องดื่ม</option>
+                <option value="snack">🍿 ขนมขบเคี้ยว</option>
+                <option value="daily">🧴 ของใช้ส่วนตัว</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-medium text-gray-700 mb-1">ไอคอน (Emoji)</label>
+              <input type="text" id="iconInput" value="📦" required class="w-full border rounded-lg px-3 py-2 text-center" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="block font-medium text-gray-700 mb-1">ราคาขาย (฿)</label>
+              <input type="number" id="priceInput" min="1" required class="w-full border rounded-lg px-3 py-2" />
+            </div>
+            <div>
+              <label class="block font-medium text-gray-700 mb-1">ราคาเดิม</label>
+              <input type="number" id="oldPriceInput" min="1" placeholder="-" class="w-full border rounded-lg px-3 py-2" />
+            </div>
+            <div>
+              <label class="block font-medium text-gray-700 mb-1">สต็อก (ชิ้น)</label>
+              <input type="number" id="stockInput" min="0" required class="w-full border rounded-lg px-3 py-2" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">ป้ายโปรโมชั่น (ไม่บังคับ)</label>
+            <input type="text" id="promoInput" placeholder="เช่น ลดราคา, ขายดี, 1 แถม 1" class="w-full border rounded-lg px-3 py-2" />
+          </div>
+
+          <div class="flex gap-2 justify-end pt-3 border-t">
+            <button type="button" id="closeModalBtn" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">ยกเลิก</button>
+            <button type="submit" class="px-5 py-2 bg-[#F58220] hover:bg-[#e07316] text-white font-bold rounded-lg">บันทึกข้อมูล</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script type="module" src="/src/admin.js"></script>
+  </body>
+</html>

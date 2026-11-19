@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link href="/src/style.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>fontend-logis</title>
+  </head>
+  <body> <div class="bg-gray-100 min-h-screen font-sans pb-16">
+    <!-- แถบเมนูด้านบน -->
+    <header class="bg-[#47b869] text-white sticky top-0 z-40 shadow-md">
+      <div class="h-1.5 bg-gradient-to-right from-[#5ac97a] via-[#f3e1a1] to-[#e18fec]"></div>
+      
+      <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+        <!-- โลโก้ร้าน SUNDAY SUNTOOLY -->
+        <div class="flex items-center gap-2 shrink-0">
+          <div class="bg-white text-[#3bb875] font-black text-base sm:text-lg px-3 py-1 rounded-lg tracking-tight uppercase">
+            SUNDAY <span class="text-[#fa84e8]">SUNTOOLY</span>
+          </div>
+        </div>
+
+        <!-- ช่องค้นหา -->
+        <div class="flex-1 max-w-md relative">
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="ค้นหาสินค้า ขนม เครื่องดื่ม..." 
+            class="w-full rounded-full py-2 pl-4 pr-10 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-[#F58220]"
+          />
+          <span class="absolute right-3.5 top-2 text-gray-400">🔍</span>
+        </div>
+
+        <!-- ปุ่มแอดมิน & ตะกร้าสินค้า -->
+        <div class="flex items-center gap-2 shrink-0">
+          <button 
+            id="adminToggleBtn" 
+            class="bg-white/15 hover:bg-white/25 text-white px-3 py-2 rounded-full font-medium text-sm flex items-center gap-1.5 transition"
+          >
+            <span>🔐</span>
+            <a href="admin.html"><span class="hidden sm:inline" id="adminBtnText">แอดมิน</span></a>
+          </button>
+
+          <button 
+            id="openCartBtn" 
+            class="relative bg-[#fadeb8] hover:bg-[#fbd3b0] text-white px-4 py-2 rounded-full font-semibold text-sm flex items-center gap-2 transition shadow"
+          >
+            <span>🛒 <span class="hidden sm:inline">ตะกร้า</span></span>
+            <span id="cartBadge" class="bg-[#f7dea2] text-white text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- แถบแจ้งเตือนเมื่ออยู่ในโหมดแอดมิน -->
+    <div id="adminBanner" class="hidden bg-gray-900 text-white text-sm py-2 px-4">
+      <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span class="bg-green-500 w-2.5 h-2.5 rounded-full animate-pulse"></span>
+          <span>กำลังใช้งานในโหมด <strong>ผู้ดูแลระบบ (Admin)</strong> — คุณสามารถเพิ่มสินค้าและแก้ไขราคาได้</span>
+        </div>
+        <div class="flex gap-2">
+          <button id="openAddProductModalBtn" class="bg-[#008060] hover:bg-[#00664d] px-3 py-1 rounded text-xs font-bold">
+            + เพิ่มสินค้าใหม่
+          </button>
+          <button id="adminLogoutBtn" class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-xs font-bold">
+            ออกจากโหมดแอดมิน
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- แถบเลือกหมวดหมู่สินค้า -->
+    <div class="bg-white shadow-sm border-b sticky top-\[62px\] z-30">
+      <div class="max-w-6xl mx-auto px-4 py-2.5 flex gap-2 overflow-x-auto" id="categoryContainer">
+        <button data-cat="all" class="cat-btn active bg-[#008060] text-white px-4 py-1.5 rounded-full text-sm font-medium shrink-0">ทั้งหมด</button>
+        <button data-cat="food" class="cat-btn bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-1.5 rounded-full text-sm font-medium shrink-0">🍱 อาหารพร้อมทาน</button>
+        <button data-cat="drink" class="cat-btn bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-1.5 rounded-full text-sm font-medium shrink-0">🥤 เครื่องดื่ม</button>
+        <button data-cat="snack" class="cat-btn bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-1.5 rounded-full text-sm font-medium shrink-0">🍿 ขนมขบเคี้ยว</button>
+        <button data-cat="daily" class="cat-btn bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-1.5 rounded-full text-sm font-medium shrink-0">🧴 ของใช้ส่วนตัว</button>
+      </div>
+    </div>
+
+    <!-- 🔴 พื้นที่แสดงการ์ดสินค้าที่จะถูกแทรกจาก main.js -->
+<div id="productGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+
+<!-- 🔴 เรียกใช้งานไฟล์ JS -->
+<script type="module" src="/src/main.js"></script>
+
+    <!-- พื้นที่แสดงรายการสินค้า -->
+    <main class="max-w-6xl mx-auto px-4 mt-6">
+      <div class="bg-[#008060] from-[#008060] to-[#00a87e] rounded-2xl p-5 mb-6 text-white flex items-center justify-between shadow-sm">
+        <div>
+          <span class="bg-[#EE2E24] text-xs font-bold px-2.5 py-1 rounded uppercase">SUNDAY SUNTOOLY</span>
+          <h2 class="text-xl sm:text-2xl font-bold mt-2">จัดส่งฟรี! เมื่อสั่งซื้อครบ 100 บาทขึ้นไป</h2>
+          <p class="text-sm text-green-100 mt-1">เช็คสต็อกเรียลไทม์ พร้อมส่งตรงถึงหน้าบ้านคุณ</p>
+        </div>
+        <div class="text-5xl hidden sm:block">🛵💨</div>
+      </div>
+
+      <!-- Grid แสดงการ์ดสินค้า -->
+      <div id="productGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <!-- การ์ดสินค้าจะถูกสร้างจาก main.js -->
+      </div>
+    </main>
+
+    <!-- 1. Modal ล็อกอินแอดมิน -->
+    <div id="loginModal" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4">
+      <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl">
+        <h3 class="text-lg font-bold text-gray-800 mb-1">🔐 เข้าสู่ระบบแอดมิน</h3>
+        <p class="text-xs text-gray-500 mb-4">กรุณากรอกรหัสผ่านเพื่อจัดการสินค้าและราคา (รหัสทดสอบ: <code class="bg-gray-100 px-1 rounded text-red-600">admin123</code>)</p>
+        
+        <form id="loginForm" class="space-y-4">
+          <input 
+            type="password" 
+            id="adminPasswordInput" 
+            placeholder="รหัสผ่านแอดมิน..." 
+            required
+            class="w-full border border-gray-300 rounded-lg px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#008060]"
+          />
+          <div class="flex gap-2 justify-end">
+            <button type="button" id="closeLoginModalBtn" class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">ยกเลิก</button>
+            <button type="submit" class="px-4 py-2 text-sm bg-[#008060] hover:bg-[#00664d] text-white font-semibold rounded-lg">เข้าสู่ระบบ</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 2. Modal เพิ่ม / แก้ไขสินค้า (เฉพาะแอดมิน) -->
+    <div id="productModal" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4">
+      <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
+        <h3 id="productModalTitle" class="text-lg font-bold text-gray-800 mb-4">เพิ่มสินค้าใหม่</h3>
+        
+        <form id="productForm" class="space-y-3 text-sm">
+          <input type="hidden" id="editProductId" />
+          
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">ชื่อสินค้า</label>
+            <input type="text" id="prodName" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#008060] outline-none" placeholder="เช่น น้ำดื่ม 600มล." />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-medium text-gray-700 mb-1">หมวดหมู่</label>
+              <select id="prodCategory" class="w-full border rounded-lg px-3 py-2 bg-white">
+                <option value="food">🍱 อาหารพร้อมทาน</option>
+                <option value="drink">🥤 เครื่องดื่ม</option>
+                <option value="snack">🍿 ขนมขบเคี้ยว</option>
+                <option value="daily">🧴 ของใช้ส่วนตัว</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-medium text-gray-700 mb-1">ไอคอน (Emoji)</label>
+              <input type="text" id="prodIcon" value="📦" required class="w-full border rounded-lg px-3 py-2 text-center" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="block font-medium text-gray-700 mb-1">ราคาขาย (฿)</label>
+              <input type="number" id="prodPrice" min="1" required class="w-full border rounded-lg px-3 py-2" />
+            </div>
+            <div>
+              <label class="block font-medium text-gray-700 mb-1">ราคาเดิม (ถ้ามี)</label>
+              <input type="number" id="prodOldPrice" min="1" placeholder="-" class="w-full border rounded-lg px-3 py-2" />
+            </div>
+            <div>
+              <label class="block font-medium text-gray-700 mb-1">สต็อก (ชิ้น)</label>
+              <input type="number" id="prodStock" min="0" required class="w-full border rounded-lg px-3 py-2" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">ป้ายโปรโมชั่น (เว้นว่างได้)</label>
+            <input type="text" id="prodPromo" placeholder="เช่น ลดราคา, ขายดี, 1 แถม 1" class="w-full border rounded-lg px-3 py-2" />
+          </div>
+
+          <div class="flex gap-2 justify-end pt-3 border-t">
+            <button type="button" id="closeProductModalBtn" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">ยกเลิก</button>
+            <button type="submit" class="px-5 py-2 bg-[#F58220] hover:bg-[#e07316] text-white font-bold rounded-lg">บันทึกข้อมูล</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 3. หน้าต่างตะกร้าสินค้า -->
+    <div id="cartDrawer" class="fixed inset-0 bg-black/50 z-50 hidden justify-end">
+      <div class="bg-white w-full max-w-md h-full flex flex-col shadow-2xl">
+        <div class="p-4 bg-[#008060] text-white flex justify-between items-center">
+          <h3 class="font-bold text-lg">🛒 ตะกร้าสินค้า SUNDAY SUNTOOLY</h3>
+          <button id="closeCartBtn" class="text-white hover:text-gray-200 text-2xl leading-none">&times;</button>
+        </div>
+        
+        <div id="cartItemsContainer" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+
+        <div class="p-4 border-t bg-gray-50">
+          <div class="flex justify-between text-base font-bold text-gray-800 mb-3">
+            <span>ยอดรวมทั้งหมด:</span>
+            <span id="cartTotal" class="text-[#EE2E24] text-xl">฿0</span>
+          </div>
+          <button id="checkoutBtn" class="w-full bg-[#F58220] hover:bg-[#e07316] text-white font-bold py-3 rounded-xl shadow transition">
+            ยืนยันการสั่งซื้อ
+          </button>
+        </div>
+      </div>
+    </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
